@@ -1,0 +1,22 @@
+{{- define "common.init_config" }}
+        - name: init-config
+          image: {{ .image }}
+          imagePullPolicy: IfNotPresent
+          env: {{ range .env }}
+          - name: {{ .name }}
+            value: {{ .value }}
+          {{- end}}
+          {{- if .environment }}
+          - name: environment
+            value: {{ .environment }}
+          {{- else }}
+          - name: environment
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          {{- end }}
+          volumeMounts:
+          - name: init-config
+            mountPath: {{ .volumeMounts.mountPath }}
+{{- end }}

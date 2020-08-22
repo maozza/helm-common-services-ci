@@ -1,0 +1,7 @@
+{{- define "common.testme" -}}
+{{- $commonValues := dict "Values" .Values.common -}}
+{{- with merge . $commonValues -}}
+
+{{ .Values |toYaml}}
+{{end}}
+{{end}}

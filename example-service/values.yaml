@@ -1,0 +1,126 @@
+# Default values for mychart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+global:
+  fullnamePrefix: ""
+  fullnameSuffix: ""
+
+
+
+replicaCount: 1
+
+
+image:
+    # repository: ""
+    # pullPolicy: Always
+    tag: latest
+    name: example-service
+
+
+
+
+
+# fullnameOverride: "example-service"
+
+env:
+  - name: SOME_ENV
+    value: "value"
+
+
+istio:
+  enabled: false
+  #statsInclusionPrefixes: listener,cluster.outbound,http,cluster_manager,listener_manager,http_mixer_filter,tcp_mixer_filter,server,cluster.xds-grpc
+
+
+readinessProbe:
+  failureThreshold: 1
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 5
+
+livenessProbe:
+  failureThreshold: 2
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 5
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 25%
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+   requests:
+    cpu: 100m
+    memory: 100Mi
+   limits:
+    cpu: 200m
+    memory: 150Mi
+
+
+ports:
+  - name: http
+    protocol: TCP
+    containerPort: 8080
+  - name: http-2
+    protocol: TCP
+    containerPort: 3001    
+
+autoscale:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
+      
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+  paths: 
+   - "/"
+  hosts:
+    - chart-example.skymaster.io
+  tls:
+    - secretName: example-skymaster-star-tls
+      hosts:
+        - chart-example.skymaster.io
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+# init_config:
+#   env: 
+#   - name: config_file
+#     value: app.yml
+#   - name: dest_directory
+#     value: /workspace/config/
+#   image: init-config:latest
+#   volumeMounts: 
+#     mountPath: /workspace/config/

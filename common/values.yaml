@@ -1,0 +1,92 @@
+# Default values for commons.
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+company: skymaster.io
+
+image:
+    repository: ""
+    pullPolicy: Always
+    tag: latest
+    name: some-app  
+
+
+replicaCount: 1
+
+fullnameOverride: ""
+
+env:
+- name: SOME_ENV
+  value: "value"
+
+
+istio:
+  enabled: false
+  statsInclusionPrefixes: "listener,cluster.outbound,cluster_manager,listener_manager,http_mixer_filter,tcp_mixer_filter,server,cluster.xds-grpc"
+
+readinessProbe:
+  failureThreshold: 1
+  httpGet:
+    path: /ping
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 35
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 3
+
+livenessProbe:
+  failureThreshold: 2
+  httpGet:
+    path: /ping
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 35
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 3
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+   requests:
+    cpu: 100m
+    memory: 200Mi
+   limits:
+    cpu: 100m
+    memory: 200Mi
+
+
+ports:
+  - name: http
+    protocol: TCP
+    containerPort: 3000
+  - name: some_port
+    protocol: TCP
+    containerPort: 3001    
+
+autoscale:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
+      
+
+
+
+ingress:
+  enabled: false
+
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

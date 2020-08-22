@@ -1,0 +1,32 @@
+{{- define "common.service" -}}
+{{- $fullName := include "common.fullname" . -}}
+{{- $commonValues := dict "Values" .Values.common -}}
+{{- with merge . $commonValues -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$fullName}}
+  labels:
+    {{block "common.deployment.labels" . -}}
+    {{ template "common.metadata.labels" . }}
+    {{- end }}
+ {{- if .Values.service.annotations }}
+  annotations:
+{{ toYaml .Values.service.annotations | indent 4 }}
+      {{- end }}      
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{$fullName}}
+    release: {{.Release.Name | quote }}
+
+
+
+{{end}}
+{{end}}
